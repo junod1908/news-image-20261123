@@ -5,7 +5,9 @@
 # standard library only: no network, no clock, no randomness, so two runs
 # write byte-identical files.
 #
-# Layout, top to bottom (v2: bigger hero + solid map + larger index type):
+# Layout, top to bottom (v2: bigger hero + solid map + larger index type;
+# v3: map pins re-placed after a geography audit, so every pin disc sits
+# on land in its own story's region instead of in the sea):
 #   * serif masthead naming the day: THE WORLD IN ONE DAY
 #     / MONDAY, 23 NOVEMBER 2026
 #   * three illustrated lead stories (Ukraine talks, COP31 fallout,
@@ -89,10 +91,10 @@ STORIES = [
     # -- Leads ---------------------------------------------------------
     (1, "UKRAINE PEACE TALKS END IN DEADLOCK",
      "US offers NATO-style guarantees; January target",
-     54, 24, 10, -8, "lead", None),
+     30.5, 50.4, 0, 0, "lead", None),
     (2, "COP31 FALLOUT: BLAME GAME BEGINS",
      "Talks ended Sunday; blame game starts Monday",
-     149, -35, 0, 0, "lead", None),
+     30.7, 36.9, 39, -1, "lead", None),
     (3, "ASIAN MARKETS EXTEND LOSSES ON AI FEARS",
      "Kospi -5%, Taiex -6.2%; Tokyo closed for holiday",
      127, 37, 0, 0, "lead", None),
@@ -102,22 +104,22 @@ STORIES = [
      -74, 41, 0, 0, "card", None),
     (5, "ANTHROPIC REBOUNDS 3% AFTER FRIDAY FALL",
      "Stock near $91.50 after $81.3B IPO",
-     -74, 41, 20, -14, "card", None),
+     -74, 41, -24, 0, "card", None),
     (6, "SOUTH KOREA RESHUFFLES FOREIGN, SPY CHIEFS",
      "First woman to lead NIS; Lee names new team",
-     127, 37, 24, 14, "card", None),
+     127, 37, -24, -8, "card", None),
     (7, "UKRAINE SINKS RUSSIAN WARSHIP MERKURY OFF LIBYA",
      "Zelenskyy: Sunday strike sank corvette Merkury",
-     20, 32, 0, 0, "card", None),
+     20, 32, -16, 5, "card", None),
     (8, "KYIV REGION DEATH TOLL RISES TO 15",
      "Dymer toll climbs Monday; boy, 7, pulled alive",
-     30, 51, 16, -12, "card", None),
+     30, 51, -23, 2, "card", None),
     (9, "SAUDI STRIKES HIT HODEIDA, FOUR KILLED",
      "Telecom building hit; 18 wounded",
-     43, 15, 0, 0, "card", None),
+     43, 15, 26, 0, "card", None),
     (10, "UN AND US CONDEMN KHARTOUM DRONE STRIKE",
      "Three UN staff hurt; UN building damaged",
-     33, 16, 0, 0, "card", None),
+     33, 16, 0, 2, "card", None),
     (11, "THAILAND-CAMBODIA CEASEFIRE HOLDS",
      "Phnom Penh confirms calm Monday morning",
      105, 12, 0, 0, "card", None),
@@ -147,7 +149,7 @@ STORIES = [
     (21, "MACRON UNVEILS 14.9B EUROS AT CHOOSE FRANCE", "",
      1, 44, 0, 0, "list", "EUROPE"),
     (22, "AUSTRALIA FREEZES MEDICINE SCRIPTS AT $25", "",
-     149, -35, 6, 4, "list", "OCEANIA"),
+     149, -35, 4, -2, "list", "OCEANIA"),
     (23, "AUSTRALIA PASSES CONTROVERSIAL DEFENCE BILL", "",
      149, -35, -6, -4, "list", "OCEANIA"),
     (24, "TAYLOR OVERTAKES ALBANESE AS PREFERRED PM", "",
@@ -177,9 +179,9 @@ STORIES = [
     (36, "TODAY: RSM CLASSIC FINAL MOVES TO MONDAY", "",
      -81, 31, 0, 0, "list", "NORTH AMERICA"),
     (37, "TURKEY PARDON VOTE OPENS MONDAY", "",
-     -77, 39, -7, 5, "list", "NORTH AMERICA"),
+     -77, 39, -7, 0, "list", "NORTH AMERICA"),
     (38, "UK PMI HOLDS AT 52.3; FACTORIES HIT 27-MONTH HIGH", "",
-     0, 51, 14, -14, "list", "EUROPE"),
+     0, 51, 14, 12, "list", "EUROPE"),
     (39, "EUROZONE PMI UNCHANGED AT 51.7", "",
      4, 51, 24, 12, "list", "EUROPE"),
     (40, "BURNHAM TELLS MPS EU DEAL IS 'LANDMARK'", "",

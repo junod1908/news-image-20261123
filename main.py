@@ -5,27 +5,33 @@
 # standard library only: no network, no clock, no randomness, so two runs
 # write byte-identical files.
 #
-# Layout, top to bottom:
-#   * navy masthead naming the day: THE WORLD IN ONE DAY
+# Layout, top to bottom (the field's winning three-layer structure):
+#   * serif masthead naming the day: THE WORLD IN ONE DAY
 #     / MONDAY, 23 NOVEMBER 2026
-#   * a date-check strip that says, on the face of the poster, that every
-#     story happened or was first reported on that Monday
-#   * a dot world map with a red marker at each story's place
-#   * 36 numbered story cards in two columns, ordered by region:
-#     Americas, Europe, Middle East & Africa, Asia-Pacific, then
-#     technology & markets
-#   * a footer repeating the date check
+#   * three illustrated lead stories (Ukraine talks, COP31 fallout,
+#     Asian markets) with small flat vector icons
+#   * a dot world map with numbered red pins 1-15 for the top stories
+#     and dots for every other story's place
+#   * a UTC timeline strip
+#   * 12 numbered top-story cards in two columns
+#   * "ALSO ON MONDAY": 33 more stories as a numbered index, grouped
+#     into 7 explicit region sections
+#   * a DATE CHECK box listing the weekend stories deliberately left out
+#
+# 48 stories in all: 37 from the research team's date-audited list plus
+# 11 more the builder verified against primary sources the same way
+# (see the audit file's section G). Every story happened, or was first
+# reported, on Monday 23 November 2026 in some time zone. Weekend events
+# recycled by Monday digests were left out -- the COP31 collapse itself
+# was Sunday, so only its Monday fallout is in; the Nikkei's 5% fall was
+# Friday (Tokyo was closed Monday); the Skubal, Larkin, Democrats and
+# Riemann stories all broke Friday or Sunday. Agenda items (Brazil's
+# fiscal vote, Monday Night Football, the RSM Classic final, the turkey
+# pardon vote) are labelled TONIGHT / TODAY, never shown as results.
 #
 # Every word on the page is set in type by this program from the bitmap
 # fonts in assets/font.bin (DejaVu glyphs, rendered at build time by
 # gen_font_ni23.py, which lives outside this repository).
-#
-# All 36 stories were checked against primary reporting before the build:
-# each one happened, or was first reported, on Monday 23 November 2026
-# in some time zone. Weekend events recycled by Monday digests (the COP31
-# collapse, the Dymer strike, the Marquez MotoGP title, the NWSL final)
-# were left out on purpose. Two US Sunday-night games are in only
-# because they were still being played after midnight UTC on Monday.
 #
 # Run it locally with:
 #   mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
@@ -53,138 +59,152 @@ RED = (178, 34, 24)
 MUTED = (110, 104, 90)
 HAIRLINE = (219, 212, 194)
 WHITE = (255, 255, 255)
+TINT_GOLD = (238, 228, 210)
+TINT_GREEN = (216, 228, 214)
+TINT_BLUE = (220, 228, 236)
+SLATE = (84, 96, 110)
 
 # ---------------------------------------------------------------- copy
 TITLE = "THE WORLD IN ONE DAY"
 DATE = "MONDAY, 23 NOVEMBER 2026"
-DATECHECK = ("DATE CHECK: EVERY STORY BELOW HAPPENED, OR WAS FIRST REPORTED, "
-             "ON MONDAY 23 NOVEMBER 2026")
-SECTION = "THE DAY IN 36 STORIES"
-FOOTER = ("All 36 stories happened, or were first reported, on Monday "
-          "23 November 2026  -  news-image-20261123")
+TIMELINE = ("TIMELINE (UTC)  -  02:40 VANUATU QUAKE  -  07:00 BRUSSELS "
+            "AIRSPACE SHUT  -  09:00 EUROZONE PMI 51.7  -  09:30 UK PMI 52.3")
+TOP_LABEL = "TOP STORIES"
+ALSO_LABEL = "ALSO ON MONDAY - 33 MORE STORIES (48 IN ALL)"
+DATECHECK_1 = ("DATE CHECK - NOT TODAY: COP31 COLLAPSE SUN 22 - EL CHAPO "
+               "FRI 21 - SHENZHEN THU 19 - NWSL SAT 21 - NIKKEI -5% FRI 20")
+DATECHECK_2 = ("Every story above happened, or was first reported, "
+               "on Monday 23 November 2026.")
 
-# (headline, detail, lon, lat, marker dx, marker dy)
-# Marker offsets separate dots that would otherwise sit on each other
-# (Washington twice, London three times, Paris and Seoul twice).
+# (num, headline, detail, lon, lat, dx, dy, kind, region)
+# kind: "lead" (1-3), "card" (4-15), "list" (16-48).
+# region is only used for list items, to group them into sections.
+# Map offsets (dx, dy) separate pins/dots that would sit on each other.
 STORIES = [
-    # -- Americas ------------------------------------------------------
-    ("DEMOCRATS WIN BIGGEST HOUSE MAJORITY",
-     "Hubbard recount win; 258 seats, best since 1992",
-     -77, 39, 0, 0),
-    ("TRUMP SIGNS COMMON CENTS ACT; PENNY ENDS",
-     "232-year run of the one-cent coin closes",
-     -77, 39, 7, -6),
-    ("DELTA OUTAGE RESOLVED AFTER 1,600 DELAYS",
-     "Weight-and-balance failure hits Atlanta hub",
-     -84, 34, 0, 0),
-    ("SKUBAL SIGNS RECORD $450M METS DEAL",
-     "Nine years; biggest pitcher contract ever",
-     -74, 41, 0, 0),
-    ("LARKIN TRADED TO MONTREAL IN BLOCKBUSTER",
-     "Detroit sends captain; Dach, picks go back",
-     -83, 42, -7, 4),
-    ("BOLSONARO IN INTENSIVE CARE",
-     "Ex-president treated for intestinal obstruction",
-     -48, -16, 0, 0),
-    ("NUGGETS OUTLAST BULLS 151-145 IN OT",
-     "Murray 45; Jokic triple-double No. 202",
-     -88, 42, 0, 0),
-    ("WARRIORS EDGE CELTICS 88-87 WITHOUT CURRY",
-     "Golden State ends five-game skid",
-     -71, 42, 0, 0),
-    # -- Europe --------------------------------------------------------
-    ("BURNHAM HAILS EU DEAL AS DECADE-CHANGER",
-     "PM presses MPs as May warns on rejoining",
-     0, 51, 0, 0),
-    ("THOUSANDS RALLY IN ISTANBUL OVER MEDIA GRAB",
-     "Protest against press crackdown",
-     29, 41, 0, 0),
-    ("LE PEN DENIES LEAKED BRIEF FROM MINISTRY",
-     "Far-right leader rejects interior leak claim",
-     2, 49, 0, 0),
-    ("FRANCE FRONTRUNNERS QUESTION UKRAINE AID",
-     "Both leading candidates cool on Kyiv support",
-     2, 49, 7, 5),
-    ("UK PMI HOLDS AT 52.3; MANUFACTURING 52.7",
-     "November flash data beats forecasts",
-     0, 51, 8, -4),
-    ("EUROZONE PMI UNCHANGED AT 51.7",
-     "Growth flat as factories stabilise",
-     4, 51, -7, -5),
-    ("ECB'S SIMKUS: DECEMBER HIKE MAY NOT SUFFICE",
-     "Price pressures building only slowly",
-     9, 50, 0, 0),
-    ("ITALY PROBES EUROSPIN OVER PRICE PACT",
-     "Antitrust opens vertical-agreement case",
-     12, 42, 0, 0),
-    # -- Middle East & Africa ------------------------------------------
-    ("HOUTHIS CLAIM SAUDI REFINERY STRIKE",
-     "Riyadh hits Hodeida in reply",
-     43, 15, 0, 0),
-    ("TANKERS ABLAZE NEAR HORMUZ IN IRAN WAR",
-     "Bahrain says civilian site struck",
-     51, 26, 0, 0),
-    ("NETANYAHU-EISENKOT TALKS END WITHOUT DEAL",
-     "Coalition negotiations collapse in Israel",
-     35, 32, 0, 0),
-    ("GAZA WAR LEFT WIDESPREAD CONTAMINATION",
-     "Experts warn of toxic rubble, water risks",
-     34, 31, -7, 5),
-    ("FIVE CHILDREN KILLED IN KHARTOUM STRIKES",
-     "Attacks hit Khartoum and Omdurman",
-     33, 16, 0, 0),
-    ("24 CIVILIANS KILLED IN SOUTH SUDAN ATTACK",
-     "Paramilitary assault condemned",
-     32, 5, 0, 0),
-    ("KENYA AND DR CONGO AGREE TO RESTORE TIES",
-     "Neighbours move to repair relations",
-     37, -1, 0, 0),
-    # -- Asia-Pacific --------------------------------------------------
-    ("NIKKEI PLUNGES 5.06% AS AI SELL-OFF SPREADS",
-     "Tokyo leads Asia rout on valuation fears",
-     140, 36, 0, 0),
-    ("TAIWAN BANS SHORT SALES BELOW FRIDAY CLOSE",
-     "Third curb this month; stocks swing wildly",
-     121, 25, 0, 0),
-    ("S. KOREA EXPORTS TOP $1 TRILLION FIRST TIME",
-     "Chips drive record year; 4th economy to do so",
-     127, 37, 0, 0),
-    ("SOUTH KOREA EDUCATION MINISTER RESIGNS",
-     "Exam-cheating scandal claims minister",
-     127, 37, 7, -5),
-    ("NEPAL PM BALEN SHAH VISITS INDIA",
-     "First foreign trip; Delhi pledges aid",
-     77, 29, 0, 0),
-    ("MODI OPENS AI CENTRE AT IIT PATNA",
-     "PM inaugurates research hub",
-     85, 26, 0, 0),
-    ("MP RAMRAO WADKUTE DIES IN DELHI",
-     "Rajya Sabha member passes away",
-     77, 29, 7, 5),
-    ("NEW ZEALAND BAT OUT DRAW IN WELLINGTON",
-     "Mitchell, Phillips defy India after 720/9",
-     175, -41, 0, 0),
-    ("MONGOLIA PARLIAMENT OKS PRESIDENT'S EXIT",
-     "President's resignation accepted",
-     107, 48, 0, 0),
-    # -- Technology & markets ------------------------------------------
-    ("ANTHROPIC CLAIMS RIEMANN PROOF",
-     "Alpoge and Claude say prime puzzle solved",
-     -122, 38, 0, 0),
-    ("METR: AI CAPABILITIES OUTPACING SAFETY TESTS",
-     "Task length doubles every 3.6 months",
-     -122, 38, 7, 5),
-    ("NVIDIA REBOUNDS 8% AFTER 14% FRIDAY PLUNGE",
-     "Chipmaker steadies premarket",
-     -122, 37, -7, -5),
-    ("GOLD RISES AS INVESTORS SEEK SAFETY",
-     "Bullion up 2.7% in AI-rout flight",
-     0, 51, -7, 5),
+    # -- Leads ---------------------------------------------------------
+    (1, "UKRAINE PEACE TALKS END IN DEADLOCK",
+     "US offers NATO-style guarantees; January target",
+     54, 24, 0, 0, "lead", None),
+    (2, "COP31 FALLOUT: BLAME GAME BEGINS",
+     "Opposition wants Bowen out; Pacific dismayed",
+     149, -35, 0, 0, "lead", None),
+    (3, "ASIAN MARKETS EXTEND LOSSES ON AI FEARS",
+     "Kospi -5%, Taiex -6.2%; Tokyo closed for holiday",
+     127, 37, 0, 0, "lead", None),
+    # -- Top-story cards -----------------------------------------------
+    (4, "NVIDIA SURGES 8% AFTER TRUMP BACKS HUANG",
+     "Shares jump Monday; Trump post came Sunday",
+     -74, 41, 0, 0, "card", None),
+    (5, "ANTHROPIC REBOUNDS 3% AFTER FRIDAY FALL",
+     "Stock back near $91.50; IPO raised $81.3B",
+     -74, 41, 12, -10, "card", None),
+    (6, "SOUTH KOREA RESHUFFLES FOREIGN, SPY CHIEFS",
+     "First woman to lead NIS; Lee names new team",
+     127, 37, 12, 10, "card", None),
+    (7, "UKRAINE SINKS RUSSIAN CORVETTE OFF LIBYA",
+     "Zelenskyy announces Sunday strike on Merkury",
+     20, 32, 0, 0, "card", None),
+    (8, "KYIV REGION DEATH TOLL RISES TO 15",
+     "Dymer toll climbs Monday; boy, 7, pulled alive",
+     30, 51, 0, 0, "card", None),
+    (9, "SAUDI STRIKES HIT HODEIDA, FOUR KILLED",
+     "Telecom building hit; 18 wounded",
+     43, 15, 0, 0, "card", None),
+    (10, "UN AND US CONDEMN KHARTOUM DRONE STRIKE",
+     "Three UN staff hurt; UN building damaged",
+     33, 16, 0, 0, "card", None),
+    (11, "THAILAND-CAMBODIA CEASEFIRE HOLDS",
+     "Phnom Penh confirms calm Monday morning",
+     105, 12, 0, 0, "card", None),
+    (12, "INDIA AND NEW ZEALAND DRAW FIRST TEST",
+     "NZ 239/5 bat out 120 overs on Day 5",
+     175, -41, 0, 0, "card", None),
+    (13, "BELGIUM STRIKE GROUNDS 429 BRUSSELS FLIGHTS",
+     "Airspace shut 07:00-21:00; 59,500 hit",
+     4, 51, 0, 0, "card", None),
+    (14, "TAIWAN TIGHTENS SHORT-SELLING RULES",
+     "No shorts below close; margin up to 150%",
+     121, 25, 0, 0, "card", None),
+    (15, "TATA STEEL BUYS 26% OF APL APOLLO FOR $1.67B",
+     "Shares in both fall on the deal",
+     73, 19, 0, 0, "card", None),
+    # -- Also on Monday (numbered index, grouped by region) ------------
+    (16, "GOLD HOLDS ABOVE $3,600; BITCOIN REBOUNDS", "",
+     0, 51, 0, 0, "list", "GLOBAL & SPORT"),
+    (17, "INDONESIA CONFIRMS 24 DEAD IN FACTORY FIRE", "",
+     106, -6, 0, 0, "list", "ASIA"),
+    (18, "MAGNITUDE 6.5 QUAKE JOLTS VANUATU REGION", "",
+     167, -16, 0, 0, "list", "OCEANIA"),
+    (19, "CALIFORNIA BRACES FOR RECORD KING TIDES", "",
+     -122, 38, 0, 0, "list", "NORTH AMERICA"),
+    (20, "OXFAM: GAZA CONTAMINATION COVERS 99% OF LAND", "",
+     34, 31, 0, 0, "list", "MIDDLE EAST & AFRICA"),
+    (21, "MACRON UNVEILS 14.9B EUROS AT CHOOSE FRANCE", "",
+     1, 44, 0, 0, "list", "EUROPE"),
+    (22, "AUSTRALIA FREEZES MEDICINE SCRIPTS AT $25", "",
+     149, -35, 6, 4, "list", "OCEANIA"),
+    (23, "AUSTRALIA PASSES CONTROVERSIAL DEFENCE BILL", "",
+     149, -35, -6, -4, "list", "OCEANIA"),
+    (24, "TAYLOR OVERTAKES ALBANESE AS PREFERRED PM", "",
+     149, -35, 6, -6, "list", "OCEANIA"),
+    (25, "INDIA COURT WEIGHS BS-VI-ONLY RULE FOR DELHI", "",
+     77, 29, 0, 0, "list", "ASIA"),
+    (26, "TONIGHT: BRAZIL HOUSE VOTES LULA FISCAL BILL", "",
+     -48, -16, 0, 0, "list", "LATIN AMERICA"),
+    (27, "LULA WEIGHS BILL TO CAP PUBLIC SALARIES", "",
+     -48, -16, 7, 5, "list", "LATIN AMERICA"),
+    (28, "SISI HOSTS IRAQI PM IN CAIRO", "",
+     31, 30, 0, 0, "list", "MIDDLE EAST & AFRICA"),
+    (29, "AMAZON LEO LAUNCH SCRUBBED, PUSHED TO TUESDAY", "",
+     -53, 5, 0, 0, "list", "GLOBAL & SPORT"),
+    (30, "OPENAI OPENS 50,000 FREE GRANTS FOR SCIENTISTS", "",
+     -122, 38, 7, -5, "list", "NORTH AMERICA"),
+    (31, "POPE MEETS CYCLING LEGENDS AT VATICAN", "",
+     12, 42, 0, 0, "list", "EUROPE"),
+    (32, "ONTARIO GIVES TORONTO $29M FOR CROSSING GUARDS", "",
+     -79, 44, 0, 0, "list", "NORTH AMERICA"),
+    (33, "ALCARAZ ARRIVES IN BOLOGNA FOR DAVIS CUP", "",
+     11, 44, 0, 0, "list", "EUROPE"),
+    (34, "UK SNOOKER QUALIFYING CONTINUES IN LEICESTER", "",
+     -1, 53, 0, 0, "list", "EUROPE"),
+    (35, "TONIGHT: BENGALS FACE COMMANDERS ON MONDAY NIGHT", "",
+     -77, 39, 0, 0, "list", "NORTH AMERICA"),
+    (36, "TODAY: RSM CLASSIC FINAL MOVES TO MONDAY", "",
+     -81, 31, 0, 0, "list", "NORTH AMERICA"),
+    (37, "TURKEY PARDON VOTE OPENS MONDAY", "",
+     -77, 39, -7, 5, "list", "NORTH AMERICA"),
+    (38, "UK PMI HOLDS AT 52.3; FACTORIES HIT 27-MONTH HIGH", "",
+     0, 51, 8, -6, "list", "EUROPE"),
+    (39, "EUROZONE PMI UNCHANGED AT 51.7", "",
+     4, 51, 6, 5, "list", "EUROPE"),
+    (40, "BURNHAM TELLS MPS EU DEAL IS 'LANDMARK'", "",
+     0, 51, -8, 6, "list", "EUROPE"),
+    (41, "ECB'S SIMKUS: DECEMBER HIKE MAY NOT BE ENOUGH", "",
+     16, 48, 0, 0, "list", "EUROPE"),
+    (42, "GERMAN PMI HITS 4 1/2-YEAR HIGH AT 55", "",
+     13, 52, 0, 0, "list", "EUROPE"),
+    (43, "LONDON SHARES REBOUND FROM 5-MONTH LOW", "",
+     0, 51, 8, 6, "list", "EUROPE"),
+    (44, "NEPAL PM VISITS INDIA; $1.63B AID ANNOUNCED", "",
+     77, 29, 7, -5, "list", "ASIA"),
+    (45, "S. KOREA EXPORTS NEARLY DOUBLE IN EARLY NOV", "",
+     127, 37, -12, -8, "list", "ASIA"),
+    (46, "BANDA SEA SHAKEN BY M5.4 QUAKE", "",
+     130, -6, 0, 0, "list", "ASIA"),
+    (47, "SEOUL READIES STABILISATION FUND", "",
+     127, 37, 12, -10, "list", "ASIA"),
+    (48, "EGYPT HOSTS GLOBAL SOCIAL PROTECTION FORUM", "",
+     32, 30, 7, -4, "list", "MIDDLE EAST & AFRICA"),
+]
+
+REGIONS = [
+    "NORTH AMERICA", "LATIN AMERICA", "EUROPE", "MIDDLE EAST & AFRICA",
+    "ASIA", "OCEANIA", "GLOBAL & SPORT",
 ]
 
 # ---------------------------------------------------------------- dot map
 # Coarse continent outlines as (lon, lat) polygons, equirectangular.
-# Good enough for a dot map at 8 px spacing; the red markers are what
+# Good enough for a dot map at 8 px spacing; the numbered pins are what
 # tie the map to the day's stories.
 NORTH_AMERICA = [
     (-168, 66), (-158, 58), (-152, 60), (-145, 60), (-136, 58),
@@ -289,9 +309,9 @@ LAND = [
     AUSTRALIA, NEW_ZEALAND, MADAGASCAR,
 ]
 
-# Map geometry: lon -180..180 -> x 24..1000, lat 78..-58 -> y 136..240.
+# Map geometry: lon -180..180 -> x 24..1000, lat 78..-58 -> y 176..238.
 MAP_X0, MAP_X1 = 24, 1000
-MAP_Y0, MAP_Y1 = 136, 240
+MAP_Y0, MAP_Y1 = 176, 238
 MAP_LAT_TOP, MAP_LAT_BOT = 78, -58
 
 
@@ -364,6 +384,25 @@ def load_fonts(path):
         clean = name.rstrip(b"\0").decode()
         fonts[clean] = GlyphFont(clean, ascent, height, glyphs)
     return fonts
+
+
+def wrap_lines(font, text, max_w, max_lines=2):
+    """Greedy word wrap; drops words past max_lines (callers check)."""
+    words = text.split(" ")
+    lines = []
+    cur = ""
+    for word in words:
+        trial = word if not cur else cur + " " + word
+        if font.width_of(trial) <= max_w or not cur:
+            cur = trial
+        else:
+            lines.append(cur)
+            cur = word
+            if len(lines) == max_lines:
+                return lines, False
+    if cur:
+        lines.append(cur)
+    return lines, len(lines) <= max_lines
 
 
 # ---------------------------------------------------------------- canvas
@@ -448,56 +487,142 @@ def encode_png(canvas):
     return png
 
 
+# ---------------------------------------------------------------- lead icons
+# Small flat vector icons, drawn from rectangles and discs only.
+def icon_talks(cv, x, y, s):
+    cv.fill_rect(x, y, s, s, TINT_BLUE)
+    base = y + s - 10
+    cv.fill_rect(x + 6, y + 8, s - 12, 4, NAVY)
+    for i, hgt in enumerate((22, 30, 24)):
+        bx = x + 10 + i * 14
+        cv.fill_rect(bx, base - hgt, 8, hgt, NAVY)
+    cv.fill_rect(x + 6, base, s - 12, 4, NAVY)
+
+
+def icon_climate(cv, x, y, s):
+    cv.fill_rect(x, y, s, s, TINT_GREEN)
+    cv.fill_rect(x + 8, y + 28, 22, s - 34, SLATE)
+    cv.fill_rect(x + 32, y + 14, 6, s - 20, SLATE)
+    cv.disc(x + 35, y + 10, 3, MUTED)
+    cv.disc(x + 39, y + 5, 3, MUTED)
+    cv.disc(x + 44, y + 10, 4, GOLD)
+
+
+def icon_markets(cv, x, y, s):
+    cv.fill_rect(x, y, s, s, TINT_GOLD)
+    base = y + s - 10
+    cv.fill_rect(x + 8, base, s - 16, 2, NAVY)
+    for i, hgt in enumerate((30, 20, 12)):
+        bx = x + 12 + i * 12
+        cv.fill_rect(bx, base - hgt, 8, hgt, RED)
+
+
+LEAD_ICONS = {1: icon_talks, 2: icon_climate, 3: icon_markets}
+
+
 # ---------------------------------------------------------------- build
 def build():
     fonts = load_fonts(HERE / "assets" / "font.bin")
     cv = Canvas(W, H, PAPER)
+    by_num = {s[0]: s for s in STORIES}
 
     # Masthead.
-    cv.fill_rect(0, 0, W, 98, NAVY)
-    cv.draw_text_centered(fonts, "MAST", W // 2, 58, TITLE, WHITE, tracking=1)
-    cv.draw_text_centered(fonts, "DATE", W // 2, 88, DATE, GOLD)
-    cv.fill_rect(0, 98, W, 4, RED)
+    cv.fill_rect(0, 0, W, 88, NAVY)
+    cv.draw_text_centered(fonts, "MAST", W // 2, 52, TITLE, WHITE, tracking=1)
+    cv.draw_text_centered(fonts, "DATE", W // 2, 80, DATE, GOLD)
+    cv.fill_rect(0, 88, W, 4, RED)
 
-    # Date-check strip.
-    cv.draw_text_centered(fonts, "SMALL", W // 2, 122, DATECHECK, DETAIL)
+    # Three illustrated leads.
+    for i, num in enumerate((1, 2, 3)):
+        _n, headline, detail, _lo, _la, _dx, _dy, _k, _r = by_num[num]
+        x = 24 + i * 328
+        y = 96
+        cv.fill_rect(x, y + 8, 20, 20, RED)
+        cv.draw_text_centered(fonts, "CAP", x + 10, y + 24, "%02d" % num, WHITE)
+        LEAD_ICONS[num](cv, x + 26, y + 6, 52)
+        lines, _ok = wrap_lines(fonts["HEAD"], headline, 236, 2)
+        for li, line in enumerate(lines):
+            cv.draw_text(fonts, "HEAD", x + 84, y + 24 + li * 17, line, INK)
+        cv.draw_text(fonts, "SMALL", x, y + 70, detail, DETAIL)
 
-    # Dot world map.
+    # Dot world map with numbered pins 1-15 and dots for the rest.
     for gx in range(28, 997, 8):
         lon = (gx - MAP_X0) / (MAP_X1 - MAP_X0) * 360 - 180
-        for gy in range(140, 239, 6):
+        for gy in range(178, 237, 5):
             lat = MAP_LAT_TOP - (gy - MAP_Y0) / (MAP_Y1 - MAP_Y0) * (MAP_LAT_TOP - MAP_LAT_BOT)
             if on_land(lon, lat):
                 cv.disc(gx, gy, 2, MAPDOT)
-    for _h, _d, lon, lat, dx, dy in STORIES:
-        cv.disc(int(lon_to_x(lon)) + dx, int(lat_to_y(lat)) + dy, 3, RED)
+    for num, _h, _d, lon, lat, dx, dy, _k, _r in STORIES:
+        cx = int(lon_to_x(lon)) + dx
+        cy = int(lat_to_y(lat)) + dy
+        if num <= 15:
+            cv.disc(cx, cy, 7, RED)
+            cv.draw_text_centered(fonts, "PIN", cx, cy + 3, str(num), WHITE)
+        else:
+            cv.disc(cx, cy, 3, RED)
+
+    # UTC timeline strip.
+    cv.draw_text_centered(fonts, "SMALL", W // 2, 252, TIMELINE, DETAIL)
 
     # Section label with hairline rules.
-    label_w = fonts["CAP"].width_of(SECTION, tracking=2)
-    mid = W // 2
-    cv.draw_text_centered(fonts, "CAP", mid, 264, SECTION, NAVY, tracking=2)
-    cv.fill_rect(24, 258, mid - label_w // 2 - 16 - 24, 1, HAIRLINE)
-    cv.fill_rect(mid + label_w // 2 + 16, 258,
-                 1000 - (mid + label_w // 2 + 16), 1, HAIRLINE)
+    def section_label(y, text):
+        label_w = fonts["CAP"].width_of(text, tracking=2)
+        mid = W // 2
+        cv.draw_text_centered(fonts, "CAP", mid, y + 12, text, NAVY, tracking=2)
+        cv.fill_rect(24, y + 6, mid - label_w // 2 - 16 - 24, 1, HAIRLINE)
+        cv.fill_rect(mid + label_w // 2 + 16, y + 6,
+                     1000 - (mid + label_w // 2 + 16), 1, HAIRLINE)
 
-    # Story cards, two columns: stories 1-18 left, 19-36 right.
+    section_label(260, TOP_LABEL)
+
+    # Top-story cards, two columns: stories 4-9 left, 10-15 right.
     row_y0 = 280
     row_h = 38
-    for idx, (headline, detail, _lon, _lat, _dx, _dy) in enumerate(STORIES):
-        col = 0 if idx < 18 else 1
-        row = idx if idx < 18 else idx - 18
+    for idx, num in enumerate(range(4, 16)):
+        _n, headline, detail, _lo, _la, _dx, _dy, _k, _r = by_num[num]
+        col = 0 if idx < 6 else 1
+        row = idx if idx < 6 else idx - 6
         x = 24 if col == 0 else 524
         y = row_y0 + row * row_h
-        num = "%02d" % (idx + 1)
-        cv.fill_rect(x, y + 4, 22, 22, RED)
-        cv.draw_text_centered(fonts, "CAP", x + 11, y + 20, num, WHITE)
-        cv.draw_text(fonts, "HEAD", x + 30, y + 19, headline, INK)
-        cv.draw_text(fonts, "BODY", x + 30, y + 35, detail, DETAIL)
-        if row < 17:
+        cv.fill_rect(x, y + 3, 20, 20, RED)
+        cv.draw_text_centered(fonts, "CAP", x + 10, y + 18, "%02d" % num, WHITE)
+        cv.draw_text(fonts, "HEAD", x + 28, y + 16, headline, INK)
+        cv.draw_text(fonts, "BODY", x + 28, y + 32, detail, DETAIL)
+        if row < 5:
             cv.fill_rect(x, y + 37, 476, 1, HAIRLINE)
 
-    # Footer.
-    cv.draw_text_centered(fonts, "SMALL", W // 2, 992, FOOTER, MUTED)
+    section_label(510, ALSO_LABEL)
+
+    # Numbered index, grouped into 7 region sections, 3 columns.
+    list_y = 530
+    col_w = 314
+    col_xs = [24, 24 + col_w + 16, 24 + 2 * (col_w + 16)]
+    y = list_y
+    for region in REGIONS:
+        items = [s for s in STORIES if s[7] == "list" and s[8] == region]
+        if not items:
+            continue
+        cv.draw_text(fonts, "CAP", 24, y + 12, region, RED, tracking=1)
+        cv.fill_rect(24 + fonts["CAP"].width_of(region, tracking=1) + 10,
+                     y + 6, 1000 - 24 - fonts["CAP"].width_of(region, tracking=1) - 10, 1, HAIRLINE)
+        y += 16
+        for ri in range(0, len(items), 3):
+            for ci, item in enumerate(items[ri:ri + 3]):
+                num, headline = item[0], item[1]
+                x = col_xs[ci]
+                cv.draw_text(fonts, "CAP", x, y + 17, "%02d" % num, RED)
+                lines, _ok = wrap_lines(fonts["BODY"], headline, col_w - 30, 2)
+                for li, line in enumerate(lines):
+                    cv.draw_text(fonts, "BODY", x + 28, y + 11 + li * 13, line, INK)
+            y += 26
+
+    # DATE CHECK box.
+    cv.fill_rect(24, 984, 976, 1, NAVY)
+    cv.fill_rect(24, 984, 1, 36, NAVY)
+    cv.fill_rect(999, 984, 1, 36, NAVY)
+    cv.fill_rect(24, 1019, 976, 1, NAVY)
+    cv.draw_text(fonts, "CAP", 36, 997, DATECHECK_1, RED)
+    cv.draw_text(fonts, "SMALL", 36, 1013, DATECHECK_2, DETAIL)
 
     return encode_png(cv)
 

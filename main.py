@@ -5,17 +5,21 @@
 # standard library only: no network, no clock, no randomness, so two runs
 # write byte-identical files.
 #
-# Layout, top to bottom (the field's winning three-layer structure):
+# Layout, top to bottom (v2: bigger hero + solid map + larger index type):
 #   * serif masthead naming the day: THE WORLD IN ONE DAY
 #     / MONDAY, 23 NOVEMBER 2026
 #   * three illustrated lead stories (Ukraine talks, COP31 fallout,
-#     Asian markets) with small flat vector icons
-#   * a dot world map with numbered red pins 1-15 for the top stories
-#     and dots for every other story's place
+#     Asian markets) with large flat vector icons (72 px)
+#   * a solid-fill world map with big numbered red pins 1-15 for the
+#     top stories, dots for every other story's place, and small
+#     continent labels
 #   * a UTC timeline strip
 #   * 12 numbered top-story cards in two columns
-#   * "ALSO ON MONDAY": 33 more stories as a numbered index, grouped
-#     into 7 explicit region sections
+#   * "ALSO ON MONDAY": 33 more stories as a numbered index in 3
+#     columns, numbers in reading order (left to right, top to
+#     bottom), set in BODY type scaled 1.25x; TONIGHT / TODAY agenda
+#     items carry a navy badge and a gold tint so they cannot be
+#     mistaken for the DATE CHECK box
 #   * a DATE CHECK box listing the weekend stories deliberately left out
 #
 # 48 stories in all: 37 from the research team's date-audited list plus
@@ -54,6 +58,7 @@ INK = (24, 24, 24)
 DETAIL = (58, 54, 46)
 NAVY = (22, 37, 62)
 MAPDOT = (52, 82, 128)
+LAND_FILL = (133, 158, 186)
 GOLD = (219, 166, 66)
 RED = (178, 34, 24)
 MUTED = (110, 104, 90)
@@ -71,7 +76,7 @@ TIMELINE = ("TIMELINE (UTC)  -  02:40 VANUATU QUAKE  -  07:00 BRUSSELS "
             "AIRSPACE SHUT  -  09:00 EUROZONE PMI 51.7  -  09:30 UK PMI 52.3")
 TOP_LABEL = "TOP STORIES"
 ALSO_LABEL = "ALSO ON MONDAY - 33 MORE STORIES (48 IN ALL)"
-DATECHECK_1 = ("DATE CHECK - NOT TODAY: COP31 COLLAPSE SUN 22 - EL CHAPO "
+DATECHECK_1 = ("DATE CHECK - NOT TODAY: COP31 FAILED SUN 22 - EL CHAPO "
                "FRI 21 - SHENZHEN THU 19 - NWSL SAT 21 - NIKKEI -5% FRI 20")
 DATECHECK_2 = ("Every story above happened, or was first reported, "
                "on Monday 23 November 2026.")
@@ -84,9 +89,9 @@ STORIES = [
     # -- Leads ---------------------------------------------------------
     (1, "UKRAINE PEACE TALKS END IN DEADLOCK",
      "US offers NATO-style guarantees; January target",
-     54, 24, 0, 0, "lead", None),
+     54, 24, 10, -8, "lead", None),
     (2, "COP31 FALLOUT: BLAME GAME BEGINS",
-     "Opposition wants Bowen out; Pacific dismayed",
+     "Talks ended Sunday; blame game starts Monday",
      149, -35, 0, 0, "lead", None),
     (3, "ASIAN MARKETS EXTEND LOSSES ON AI FEARS",
      "Kospi -5%, Taiex -6.2%; Tokyo closed for holiday",
@@ -96,17 +101,17 @@ STORIES = [
      "Shares jump Monday; Trump post came Sunday",
      -74, 41, 0, 0, "card", None),
     (5, "ANTHROPIC REBOUNDS 3% AFTER FRIDAY FALL",
-     "Stock back near $91.50; IPO raised $81.3B",
-     -74, 41, 12, -10, "card", None),
+     "Stock near $91.50 after $81.3B IPO",
+     -74, 41, 20, -14, "card", None),
     (6, "SOUTH KOREA RESHUFFLES FOREIGN, SPY CHIEFS",
      "First woman to lead NIS; Lee names new team",
-     127, 37, 12, 10, "card", None),
-    (7, "UKRAINE SINKS RUSSIAN CORVETTE OFF LIBYA",
-     "Zelenskyy announces Sunday strike on Merkury",
+     127, 37, 24, 14, "card", None),
+    (7, "UKRAINE SINKS RUSSIAN WARSHIP MERKURY OFF LIBYA",
+     "Zelenskyy: Sunday strike sank corvette Merkury",
      20, 32, 0, 0, "card", None),
     (8, "KYIV REGION DEATH TOLL RISES TO 15",
      "Dymer toll climbs Monday; boy, 7, pulled alive",
-     30, 51, 0, 0, "card", None),
+     30, 51, 16, -12, "card", None),
     (9, "SAUDI STRIKES HIT HODEIDA, FOUR KILLED",
      "Telecom building hit; 18 wounded",
      43, 15, 0, 0, "card", None),
@@ -124,9 +129,9 @@ STORIES = [
      4, 51, 0, 0, "card", None),
     (14, "TAIWAN TIGHTENS SHORT-SELLING RULES",
      "No shorts below close; margin up to 150%",
-     121, 25, 0, 0, "card", None),
+     121, 25, -14, 10, "card", None),
     (15, "TATA STEEL BUYS 26% OF APL APOLLO FOR $1.67B",
-     "Shares in both fall on the deal",
+     "Steel-pipe maker APL Apollo; shares fall in both",
      73, 19, 0, 0, "card", None),
     # -- Also on Monday (numbered index, grouped by region) ------------
     (16, "GOLD HOLDS ABOVE $3,600; BITCOIN REBOUNDS", "",
@@ -174,17 +179,17 @@ STORIES = [
     (37, "TURKEY PARDON VOTE OPENS MONDAY", "",
      -77, 39, -7, 5, "list", "NORTH AMERICA"),
     (38, "UK PMI HOLDS AT 52.3; FACTORIES HIT 27-MONTH HIGH", "",
-     0, 51, 8, -6, "list", "EUROPE"),
+     0, 51, 14, -14, "list", "EUROPE"),
     (39, "EUROZONE PMI UNCHANGED AT 51.7", "",
-     4, 51, 6, 5, "list", "EUROPE"),
+     4, 51, 24, 12, "list", "EUROPE"),
     (40, "BURNHAM TELLS MPS EU DEAL IS 'LANDMARK'", "",
-     0, 51, -8, 6, "list", "EUROPE"),
+     0, 51, -16, 8, "list", "EUROPE"),
     (41, "ECB'S SIMKUS: DECEMBER HIKE MAY NOT BE ENOUGH", "",
      16, 48, 0, 0, "list", "EUROPE"),
     (42, "GERMAN PMI HITS 4 1/2-YEAR HIGH AT 55", "",
      13, 52, 0, 0, "list", "EUROPE"),
     (43, "LONDON SHARES REBOUND FROM 5-MONTH LOW", "",
-     0, 51, 8, 6, "list", "EUROPE"),
+     0, 51, 26, 14, "list", "EUROPE"),
     (44, "NEPAL PM VISITS INDIA; $1.63B AID ANNOUNCED", "",
      77, 29, 7, -5, "list", "ASIA"),
     (45, "S. KOREA EXPORTS NEARLY DOUBLE IN EARLY NOV", "",
@@ -197,11 +202,9 @@ STORIES = [
      32, 30, 7, -4, "list", "MIDDLE EAST & AFRICA"),
 ]
 
-REGIONS = [
-    "NORTH AMERICA", "LATIN AMERICA", "EUROPE", "MIDDLE EAST & AFRICA",
-    "ASIA", "OCEANIA", "GLOBAL & SPORT",
-]
-
+# (Index items are shown in numeric reading order, row-major across
+# three columns; the region field is kept only as data, no longer
+# used to group the index into sections.)
 # ---------------------------------------------------------------- dot map
 # Coarse continent outlines as (lon, lat) polygons, equirectangular.
 # Good enough for a dot map at 8 px spacing; the numbered pins are what
@@ -309,10 +312,20 @@ LAND = [
     AUSTRALIA, NEW_ZEALAND, MADAGASCAR,
 ]
 
-# Map geometry: lon -180..180 -> x 24..1000, lat 78..-58 -> y 176..238.
+# Map geometry: lon -180..180 -> x 24..1000, lat 78..-58 -> y 196..284.
 MAP_X0, MAP_X1 = 24, 1000
-MAP_Y0, MAP_Y1 = 176, 238
+MAP_Y0, MAP_Y1 = 196, 284
 MAP_LAT_TOP, MAP_LAT_BOT = 78, -58
+
+# Small continent labels (lon, lat) -- placed clear of the pins.
+MAP_LABELS = [
+    ("NORTH AMERICA", -120, 55),
+    ("SOUTH AMERICA", -68, -40),
+    ("EUROPE", -15, 50),
+    ("AFRICA", 20, -5),
+    ("ASIA", 95, 65),
+    ("AUSTRALIA", 134, -25),
+]
 
 
 def lon_to_x(lon):
@@ -345,6 +358,26 @@ def on_land(lon, lat):
         if inside:
             return True
     return False
+def fill_poly(cv, pts, color):
+    """Even-odd scanline fill of a pixel polygon (continent outlines)."""
+    if len(pts) < 3:
+        return
+    min_y = min(p[1] for p in pts)
+    max_y = max(p[1] for p in pts)
+    n = len(pts)
+    for yy in range(min_y, max_y + 1):
+        xs = []
+        for i in range(n):
+            x1, y1 = pts[i]
+            x2, y2 = pts[(i + 1) % n]
+            if (y1 <= yy < y2) or (y2 <= yy < y1):
+                xs.append(x1 + (yy - y1) * (x2 - x1) / (y2 - y1))
+        xs.sort()
+        for j in range(0, len(xs) - 1, 2):
+            x0 = int(xs[j])
+            x1 = int(xs[j + 1])
+            if x1 >= x0:
+                cv.fill_rect(x0, yy, x1 - x0 + 1, 1, color)
 
 
 # ---------------------------------------------------------------- fonts
@@ -394,6 +427,35 @@ def wrap_lines(font, text, max_w, max_lines=2):
     for word in words:
         trial = word if not cur else cur + " " + word
         if font.width_of(trial) <= max_w or not cur:
+            cur = trial
+        else:
+            lines.append(cur)
+            cur = word
+            if len(lines) == max_lines:
+                return lines, False
+    if cur:
+        lines.append(cur)
+    return lines, len(lines) <= max_lines
+
+
+def wrap_lines_scaled(fonts, font_name, text, max_ws, scale, max_lines=2):
+    """Greedy word wrap at a fractional scale; max_ws is a per-line
+    width list (first line may be narrower, e.g. behind a badge)."""
+    font = fonts[font_name]
+    if isinstance(max_ws, (int, float)):
+        max_ws = [max_ws] * max_lines
+
+    def w(t):
+        return sum(max(1, int(round(font.glyphs.get(ord(c), (0, b""))[0] * scale)))
+                   for c in t)
+
+    words = text.split(" ")
+    lines = []
+    cur = ""
+    for word in words:
+        trial = word if not cur else cur + " " + word
+        limit = max_ws[min(len(lines), len(max_ws) - 1)]
+        if w(trial) <= limit or not cur:
             cur = trial
         else:
             lines.append(cur)
@@ -466,6 +528,47 @@ class Canvas:
         w = font.width_of(text, tracking)
         self.draw_text(fonts, font_name, cx - w // 2, baseline, text, color, tracking)
 
+    def width_scaled(self, fonts, font_name, text, scale, tracking=0):
+        """Pixel width of text drawn with draw_text_scaled (same rounding)."""
+        font = fonts[font_name]
+        total = sum(max(1, int(round(font.glyphs.get(ord(ch), (0, b""))[0] * scale)))
+                    for ch in text)
+        return total + int(round(tracking * scale)) * max(0, len(text) - 1)
+
+    def draw_text_scaled(self, fonts, font_name, x, baseline, text, color, scale, tracking=0):
+        """Draw bitmap text scaled by a fractional factor with
+        nearest-neighbour sampling (keeps the stdlib-only, deterministic
+        renderer; used for the 1.25x index type and the big pin numbers)."""
+        font = fonts[font_name]
+        top = baseline - int(round(font.ascent * scale))
+        pen = x
+        step = int(round(tracking * scale))
+        for ch in text:
+            glyph = font.glyphs.get(ord(ch))
+            if glyph is None:
+                continue
+            advance, bits = glyph
+            gw = max(1, int(round(advance * scale)))
+            gh = max(1, int(round(font.height * scale)))
+            stride = (advance + 7) // 8
+            for dy in range(gh):
+                sy = min(font.height - 1, int(dy / scale))
+                chunk = bits[sy * stride:(sy + 1) * stride]
+                if not any(chunk):
+                    continue
+                yy = top + dy
+                if yy < 0 or yy >= self.h:
+                    continue
+                for dx in range(gw):
+                    sx = min(advance - 1, int(dx / scale))
+                    if chunk[sx // 8] & (0x80 >> (sx % 8)):
+                        self.set_px(pen + dx, yy, color)
+            pen += gw + step
+
+    def draw_text_scaled_centered(self, fonts, font_name, cx, baseline, text, color, scale, tracking=0):
+        w = self.width_scaled(fonts, font_name, text, scale, tracking)
+        self.draw_text_scaled(fonts, font_name, cx - w // 2, baseline, text, color, scale, tracking)
+
 
 # ---------------------------------------------------------------- PNG out
 def _chunk(kind, data):
@@ -489,32 +592,37 @@ def encode_png(canvas):
 
 # ---------------------------------------------------------------- lead icons
 # Small flat vector icons, drawn from rectangles and discs only.
+# Every length scales with s (v1 used s = 52; v2 uses s = 72).
 def icon_talks(cv, x, y, s):
+    k = s / 52.0
     cv.fill_rect(x, y, s, s, TINT_BLUE)
-    base = y + s - 10
-    cv.fill_rect(x + 6, y + 8, s - 12, 4, NAVY)
-    for i, hgt in enumerate((22, 30, 24)):
-        bx = x + 10 + i * 14
-        cv.fill_rect(bx, base - hgt, 8, hgt, NAVY)
-    cv.fill_rect(x + 6, base, s - 12, 4, NAVY)
+    bar = max(2, round(4 * k))
+    cv.fill_rect(x + round(6 * k), y + round(8 * k), s - round(12 * k), bar, NAVY)
+    base = y + s - round(10 * k)
+    for i, hgt in enumerate((18, 24, 20)):
+        bx = x + round(10 * k) + i * round(14 * k)
+        cv.fill_rect(bx, base - round(hgt * k), round(8 * k), round(hgt * k), NAVY)
+    cv.fill_rect(x + round(6 * k), base, s - round(12 * k), bar, NAVY)
 
 
 def icon_climate(cv, x, y, s):
+    k = s / 52.0
     cv.fill_rect(x, y, s, s, TINT_GREEN)
-    cv.fill_rect(x + 8, y + 28, 22, s - 34, SLATE)
-    cv.fill_rect(x + 32, y + 14, 6, s - 20, SLATE)
-    cv.disc(x + 35, y + 10, 3, MUTED)
-    cv.disc(x + 39, y + 5, 3, MUTED)
-    cv.disc(x + 44, y + 10, 4, GOLD)
+    cv.fill_rect(x + round(8 * k), y + round(28 * k), round(22 * k), s - round(34 * k), SLATE)
+    cv.fill_rect(x + round(32 * k), y + round(14 * k), round(6 * k), s - round(20 * k), SLATE)
+    cv.disc(x + round(35 * k), y + round(10 * k), max(2, round(3 * k)), MUTED)
+    cv.disc(x + round(39 * k), y + round(5 * k), max(2, round(3 * k)), MUTED)
+    cv.disc(x + round(44 * k), y + round(10 * k), max(2, round(4 * k)), GOLD)
 
 
 def icon_markets(cv, x, y, s):
+    k = s / 52.0
     cv.fill_rect(x, y, s, s, TINT_GOLD)
-    base = y + s - 10
-    cv.fill_rect(x + 8, base, s - 16, 2, NAVY)
+    base = y + s - round(10 * k)
+    cv.fill_rect(x + round(8 * k), base, s - round(16 * k), max(2, round(2 * k)), NAVY)
     for i, hgt in enumerate((30, 20, 12)):
-        bx = x + 12 + i * 12
-        cv.fill_rect(bx, base - hgt, 8, hgt, RED)
+        bx = x + round(12 * k) + i * round(12 * k)
+        cv.fill_rect(bx, base - round(hgt * k), round(8 * k), round(hgt * k), RED)
 
 
 LEAD_ICONS = {1: icon_talks, 2: icon_climate, 3: icon_markets}
@@ -532,37 +640,42 @@ def build():
     cv.draw_text_centered(fonts, "DATE", W // 2, 80, DATE, GOLD)
     cv.fill_rect(0, 88, W, 4, RED)
 
-    # Three illustrated leads.
+    # Three illustrated leads (large 72 px icons).
     for i, num in enumerate((1, 2, 3)):
         _n, headline, detail, _lo, _la, _dx, _dy, _k, _r = by_num[num]
         x = 24 + i * 328
         y = 96
-        cv.fill_rect(x, y + 8, 20, 20, RED)
-        cv.draw_text_centered(fonts, "CAP", x + 10, y + 24, "%02d" % num, WHITE)
-        LEAD_ICONS[num](cv, x + 26, y + 6, 52)
-        lines, _ok = wrap_lines(fonts["HEAD"], headline, 236, 2)
+        cv.fill_rect(x, y + 4, 24, 24, RED)
+        cv.draw_text_centered(fonts, "CAP", x + 12, y + 22, "%02d" % num, WHITE)
+        LEAD_ICONS[num](cv, x + 30, y + 4, 72)
+        lines, ok = wrap_lines(fonts["HEAD"], headline, 216, 2)
+        if not ok:
+            raise ValueError("lead headline overflows: %r" % headline)
         for li, line in enumerate(lines):
-            cv.draw_text(fonts, "HEAD", x + 84, y + 24 + li * 17, line, INK)
-        cv.draw_text(fonts, "SMALL", x, y + 70, detail, DETAIL)
+            cv.draw_text(fonts, "HEAD", x + 110, y + 22 + li * 17, line, INK)
+        cv.draw_text(fonts, "SMALL", x, y + 88, detail, DETAIL)
 
-    # Dot world map with numbered pins 1-15 and dots for the rest.
-    for gx in range(28, 997, 8):
-        lon = (gx - MAP_X0) / (MAP_X1 - MAP_X0) * 360 - 180
-        for gy in range(178, 237, 5):
-            lat = MAP_LAT_TOP - (gy - MAP_Y0) / (MAP_Y1 - MAP_Y0) * (MAP_LAT_TOP - MAP_LAT_BOT)
-            if on_land(lon, lat):
-                cv.disc(gx, gy, 2, MAPDOT)
+    # Solid world map with big numbered pins 1-15 and dots for the rest.
+    cv.fill_rect(24, 194, 976, 1, HAIRLINE)
+    cv.fill_rect(24, 286, 976, 1, HAIRLINE)
+    for poly in LAND:
+        pts = [(int(lon_to_x(lon)), int(lat_to_y(lat))) for lon, lat in poly]
+        fill_poly(cv, pts, LAND_FILL)
+    for label, lon, lat in MAP_LABELS:
+        cv.draw_text_centered(fonts, "SMALL", int(lon_to_x(lon)),
+                              int(lat_to_y(lat)), label, NAVY)
     for num, _h, _d, lon, lat, dx, dy, _k, _r in STORIES:
         cx = int(lon_to_x(lon)) + dx
         cy = int(lat_to_y(lat)) + dy
         if num <= 15:
-            cv.disc(cx, cy, 7, RED)
-            cv.draw_text_centered(fonts, "PIN", cx, cy + 3, str(num), WHITE)
+            cv.disc(cx, cy, 12, RED)
+            cv.draw_text_scaled_centered(fonts, "PIN", cx, cy + 7,
+                                         str(num), WHITE, 1.75)
         else:
             cv.disc(cx, cy, 3, RED)
 
     # UTC timeline strip.
-    cv.draw_text_centered(fonts, "SMALL", W // 2, 252, TIMELINE, DETAIL)
+    cv.draw_text_centered(fonts, "SMALL", W // 2, 296, TIMELINE, DETAIL)
 
     # Section label with hairline rules.
     def section_label(y, text):
@@ -573,50 +686,81 @@ def build():
         cv.fill_rect(mid + label_w // 2 + 16, y + 6,
                      1000 - (mid + label_w // 2 + 16), 1, HAIRLINE)
 
-    section_label(260, TOP_LABEL)
+    section_label(304, TOP_LABEL)
 
     # Top-story cards, two columns: stories 4-9 left, 10-15 right.
-    row_y0 = 280
-    row_h = 38
+    # Headlines are set with tracking -1 so the long warship headline
+    # fits on one line without shrinking the type.
+    row_y0 = 320
+    row_h = 37
     for idx, num in enumerate(range(4, 16)):
         _n, headline, detail, _lo, _la, _dx, _dy, _k, _r = by_num[num]
         col = 0 if idx < 6 else 1
         row = idx if idx < 6 else idx - 6
         x = 24 if col == 0 else 524
         y = row_y0 + row * row_h
+        if fonts["HEAD"].width_of(headline, tracking=-1) > 448:
+            raise ValueError("card headline too wide: %r" % headline)
+        if fonts["BODY"].width_of(detail) > 448:
+            raise ValueError("card detail too wide: %r" % detail)
         cv.fill_rect(x, y + 3, 20, 20, RED)
         cv.draw_text_centered(fonts, "CAP", x + 10, y + 18, "%02d" % num, WHITE)
-        cv.draw_text(fonts, "HEAD", x + 28, y + 16, headline, INK)
-        cv.draw_text(fonts, "BODY", x + 28, y + 32, detail, DETAIL)
+        cv.draw_text(fonts, "HEAD", x + 28, y + 15, headline, INK, tracking=-1)
+        cv.draw_text(fonts, "BODY", x + 28, y + 30, detail, DETAIL)
         if row < 5:
-            cv.fill_rect(x, y + 37, 476, 1, HAIRLINE)
+            cv.fill_rect(x, y + 35, 476, 1, HAIRLINE)
 
-    section_label(510, ALSO_LABEL)
+    section_label(550, ALSO_LABEL)
 
-    # Numbered index, grouped into 7 region sections, 3 columns.
-    list_y = 530
+    # Numbered index in reading order: row-major across 3 columns, so
+    # the numbers run 16, 17, 18 across the top row, then 19, 20, 21,
+    # and so on down to 48. Type is BODY scaled 1.25x (+25% on v1).
+    # TONIGHT / TODAY agenda items get a navy badge and a gold tint,
+    # visually separated from the DATE CHECK box at the foot.
+    list_y = 568
     col_w = 314
     col_xs = [24, 24 + col_w + 16, 24 + 2 * (col_w + 16)]
-    y = list_y
-    for region in REGIONS:
-        items = [s for s in STORIES if s[7] == "list" and s[8] == region]
-        if not items:
-            continue
-        cv.draw_text(fonts, "CAP", 24, y + 12, region, RED, tracking=1)
-        cv.fill_rect(24 + fonts["CAP"].width_of(region, tracking=1) + 10,
-                     y + 6, 1000 - 24 - fonts["CAP"].width_of(region, tracking=1) - 10, 1, HAIRLINE)
-        y += 16
-        for ri in range(0, len(items), 3):
-            for ci, item in enumerate(items[ri:ri + 3]):
-                num, headline = item[0], item[1]
-                x = col_xs[ci]
-                cv.draw_text(fonts, "CAP", x, y + 17, "%02d" % num, RED)
-                lines, _ok = wrap_lines(fonts["BODY"], headline, col_w - 30, 2)
-                for li, line in enumerate(lines):
-                    cv.draw_text(fonts, "BODY", x + 28, y + 11 + li * 13, line, INK)
-            y += 26
+    row_pitch = 37
+    line_pitch = 18
+    index_scale = 1.25
+    list_items = sorted((s for s in STORIES if s[7] == "list"), key=lambda s: s[0])
+    for pos, item in enumerate(list_items):
+        num, headline = item[0], item[1]
+        row, col = divmod(pos, 3)
+        x = col_xs[col]
+        y = list_y + row * row_pitch
+        agenda = None
+        for tag in ("TONIGHT:", "TODAY:"):
+            if headline.startswith(tag):
+                agenda = tag[:-1]
+                headline = headline[len(tag):].strip()
+                break
+        text_x = x + 28
+        if agenda:
+            cv.fill_rect(x - 4, y - 2, col_w + 6, row_pitch + 2, TINT_GOLD)
+            badge_w = fonts["CAP"].width_of(agenda) + 12
+            cv.fill_rect(text_x, y + 1, badge_w, 18, NAVY)
+            cv.draw_text_centered(fonts, "CAP", text_x + badge_w // 2,
+                                  y + 15, agenda, WHITE)
+            first_w = col_w - 28 - badge_w - 6
+            lines, ok = wrap_lines_scaled(fonts, "BODY", headline,
+                                          [first_w, col_w - 28],
+                                          index_scale, 2)
+            line_xs = [text_x + badge_w + 6, text_x]
+        else:
+            lines, ok = wrap_lines_scaled(fonts, "BODY", headline,
+                                          col_w - 28, index_scale, 2)
+            line_xs = [text_x, text_x]
+        if not ok:
+            raise ValueError("index item overflows two lines: #%d %r" % (num, headline))
+        cv.draw_text(fonts, "CAP", x, y + 15, "%02d" % num, RED)
+        for li, line in enumerate(lines):
+            cv.draw_text_scaled(fonts, "BODY", line_xs[li], y + 15 + li * line_pitch,
+                                line, INK, index_scale)
 
     # DATE CHECK box.
+    if fonts["CAP"].width_of(DATECHECK_1) > 964:
+        raise ValueError("DATE CHECK line too wide")
     cv.fill_rect(24, 984, 976, 1, NAVY)
     cv.fill_rect(24, 984, 1, 36, NAVY)
     cv.fill_rect(999, 984, 1, 36, NAVY)
